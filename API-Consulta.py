@@ -54,10 +54,10 @@ if numero_pedido:
         cabecalho = dados.get("pedido_venda_produto", {}).get("cabecalho",{})
         etapa = cabecalho.get("etapa","")
         
-     if etapa =="60":
-        st.warning("Este pedido já foi faturado e não pode ser alterado!")
-        st.stop()
-        st.spinner()
+    if etapa =="60":
+            st.warning("Este pedido já foi faturado e não pode ser alterado!")
+            st.stop()
+            st.spinner()
     else:
     
         if "pedido_venda_produto" in dados:
