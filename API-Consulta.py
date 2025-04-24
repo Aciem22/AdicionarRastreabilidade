@@ -51,7 +51,15 @@ numero_pedido = st.text_input("Digite o número do pedido:")
 if numero_pedido:
     with st.spinner("Consultando pedido..."):
         dados = consultar_pedido(numero_pedido)
-
+        cabecalho = dados.get("pedido_venda_produto", {}).get("cabecalho",{})
+        etapa = cabecalho.get("etapa","")
+        
+     if etapa =="60":
+        st.warning("Este pedido já foi faturado e não pode ser alterado!")
+        st.stop()
+        st.spinner()
+    else:
+    
     if "pedido_venda_produto" in dados:
         pedido = dados["pedido_venda_produto"]
         itens = pedido.get("det", [])
