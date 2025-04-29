@@ -99,11 +99,7 @@ for idx, item in enumerate(itens):
         st.session_state[f"show_cam_{idx}"] = not st.session_state.get(f"show_cam_{idx}", False)
 
     if st.session_state.get(f"show_cam_{idx}", False):
-        col_cam, col_dummy = st.columns([1, 4])
-        with col_cam:
-            img = st.camera_input(f"{idx+1}. {desc}", key=f"cam_{idx}")
-        with col_dummy:
-            st.write("")
+        img = st.camera_input(f"{idx+1}. {desc}", key=f"cam_{idx}")
         if img:
             with st.spinner("Processando OCR..."):
                 img_pil = Image.open(io.BytesIO(img.getvalue()))
@@ -163,3 +159,4 @@ with st.form("form_lotes"):
             st.error("Erro: "+res["faultstring"])
         else:
             st.success("Pedido alterado com sucesso!")
+
