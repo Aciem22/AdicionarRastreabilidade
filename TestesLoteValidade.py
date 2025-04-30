@@ -50,28 +50,18 @@ def corrigir_texto_ocr(texto):
                  .replace("0CT","OCT")
                  .replace("DE2","DEZ")
                  .replace("FEVEREIR0","FEVEREIRO")
-                 .replace("FEU","FEV")
-                 .replace("NOU","NOV")
                  .replace("UAL","VAL"))
 
 def converter_validade(mes_ano_str):
-    meses = {
-        'JAN': '01', 'FEV': '02', 'MAR': '03', 'ABR': '04',
-        'MAI': '05', 'JUN': '06', 'JUL': '07', 'AGO': '08',
-        'SET': '09', 'OUT': '10', 'NOV': '11', 'DEZ': '12'
-    }
-
-    m = re.match(r"([A-Za-z]{2,3}|\d{2})/?(\d{2,4})", mes_ano_str)
+    meses = {'JAN':'01','FEV':'02','MAR':'03','ABR':'04','MAI':'05','JUN':'06',
+             'JUL':'07','AGO':'08','SET':'09','OUT':'10','NOV':'11','DEZ':'12'}
+    m = re.match(r"([A-Z]{2,3})/(\d{2,4})", mes_ano_str)
     if m:
         ma, a = m.groups()
-        mm = meses.get(ma[:3].upper(), ma.zfill(2))
-        if len(a) == 2:
-            a = "20" + a
-        try:
-            d = calendar.monthrange(int(a), int(mm))[1]
-            return f"{d:02d}/{mm}/{a}"
-        except:
-            return mes_ano_str
+        mm = meses.get(ma[:3], '01')
+        if len(a)==2: a = "20"+a
+        d = calendar.monthrange(int(a), int(mm))[1]
+        return f"{d:02d}/{mm}/{a}"
     return mes_ano_str
 
 # ─── App ──────────────────────────────────────────────────────────────────────
@@ -119,11 +109,19 @@ for idx, item in enumerate(itens):
 
                 # extrai lote e validade
                 lm = re.search(r"(?:[Ll1]ote|[Ll1])[.:\s]*([A-Za-z0-9\-\/]+)", txtc)
-                vm = re.search(r"(?:[Vv]al(?:idade)?|[Vv])[:\s]*([A-Za-z]{2,3}|\d{2})/?(\d{2,4})", txtc, flags=re.IGNORECASE)
+                vm = re.search( r"(?:VAL(?:IDADE)?|V)[\s:]*"        # prefixo "VAL","VALIDADE" ou "V"
+                                r"([A-Z]{2,3}|\d{2})"               # grupo 1: "JAN" ou "04"
+                                r"[\/\-]?"                          # opcional "/" ou "-"
+                                r"(\d{2,4})", txtc, flags=re.IGNORECASE)
                 lote = lm.group(1) if lm else ""
+
                 if vm:
-                    validade_raw = f"{vm.group(1)}/{vm.group(2)}"
-                    validade = converter_validade(validade_raw)
+                    mes, ano = vm.group(1), vm.group(2)
+                    mes_ano_raw = f"{mes}/{ano}"
+                    val = converter_validade(mes_ano_raw)  
+    
+                else:
+                    val = ""  # ou o que fizer sentido no seu fluxo
                 # salva no session_state
                 st.session_state['ocr_data'][idx] = {'lote':lote, 'validade':val}
 
@@ -171,4 +169,5 @@ with st.form("form_lotes"):
             st.error("Erro: "+res["faultstring"])
         else:
             st.success("Pedido alterado com sucesso!")
+
 
