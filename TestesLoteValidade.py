@@ -51,18 +51,23 @@ def corrigir_texto_ocr(texto):
                  .replace("DE2","DEZ")
                  .replace("FEVEREIR0","FEVEREIRO")
                  .replace("FEU","FEV")
+                 .replace("NOU","NOV")
                  .replace("UAL","VAL"))
 
 def converter_validade(mes_ano_str):
     meses = {'JAN':'01','FEV':'02','MAR':'03','ABR':'04','MAI':'05','JUN':'06',
              'JUL':'07','AGO':'08','SET':'09','OUT':'10','NOV':'11','DEZ':'12'}
-    m = re.match(r"([A-Z]{2,3})/(\d{2,4})", mes_ano_str)
+    m = re.match(r"([A-Za-z]{2,3}|\d{2})/?(\d{2,4})", mes_ano_str)
     if m:
         ma, a = m.groups()
-        mm = meses.get(ma[:3], '01')
-        if len(a)==2: a = "20"+a
-        d = calendar.monthrange(int(a), int(mm))[1]
-        return f"{d:02d}/{mm}/{a}"
+        mm = meses.get(ma[:3].upper(), ma.zfill(2))
+        if len(a) == 2:
+            a = "20" + a
+        try:
+            d = calendar.monthrange(int(a), int(mm))[1]
+            return f"{d:02d}/{mm}/{a}"
+        except:
+            pass
     return mes_ano_str
 
 # ─── App ──────────────────────────────────────────────────────────────────────
@@ -110,7 +115,7 @@ for idx, item in enumerate(itens):
 
                 # extrai lote e validade
                 lm = re.search(r"(?:[Ll1]ote|[Ll1])[.:\s]*([A-Za-z0-9\-\/]+)", txtc)
-                vm = re.search(r"(?:[Vv]al(?:idade)?|[Vv])[:\s]*([A-Za-z]{2,3}/?\d{2,4})", txtc, flags=re.IGNORECASE)
+                vm = re.search(r"(?:[Vv]al(?:idade)?|[Vv])[:\s]*([A-Za-z]{2,3}|\d{2})/?(\d{2,4})", txtc, flags=re.IGNORECASE)
                 lote = lm.group(1) if lm else ""
                 val = converter_validade(vm.group(1)) if vm else ""
                 # salva no session_state
