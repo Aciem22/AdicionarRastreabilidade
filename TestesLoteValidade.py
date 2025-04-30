@@ -55,8 +55,12 @@ def corrigir_texto_ocr(texto):
                  .replace("UAL","VAL"))
 
 def converter_validade(mes_ano_str):
-    meses = {'JAN':'01','FEV':'02','MAR':'03','ABR':'04','MAI':'05','JUN':'06',
-             'JUL':'07','AGO':'08','SET':'09','OUT':'10','NOV':'11','DEZ':'12'}
+    meses = {
+        'JAN': '01', 'FEV': '02', 'MAR': '03', 'ABR': '04',
+        'MAI': '05', 'JUN': '06', 'JUL': '07', 'AGO': '08',
+        'SET': '09', 'OUT': '10', 'NOV': '11', 'DEZ': '12'
+    }
+
     m = re.match(r"([A-Za-z]{2,3}|\d{2})/?(\d{2,4})", mes_ano_str)
     if m:
         ma, a = m.groups()
@@ -67,7 +71,7 @@ def converter_validade(mes_ano_str):
             d = calendar.monthrange(int(a), int(mm))[1]
             return f"{d:02d}/{mm}/{a}"
         except:
-            pass
+            return mes_ano_str
     return mes_ano_str
 
 # ─── App ──────────────────────────────────────────────────────────────────────
@@ -117,7 +121,9 @@ for idx, item in enumerate(itens):
                 lm = re.search(r"(?:[Ll1]ote|[Ll1])[.:\s]*([A-Za-z0-9\-\/]+)", txtc)
                 vm = re.search(r"(?:[Vv]al(?:idade)?|[Vv])[:\s]*([A-Za-z]{2,3}|\d{2})/?(\d{2,4})", txtc, flags=re.IGNORECASE)
                 lote = lm.group(1) if lm else ""
-                val = converter_validade(vm.group(1)) if vm else ""
+                if vm:
+                    validade_raw = f"{vm.group(1)}/{vm.group(2)}"
+                    validade = converter_validade(validade_raw)
                 # salva no session_state
                 st.session_state['ocr_data'][idx] = {'lote':lote, 'validade':val}
 
