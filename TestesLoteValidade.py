@@ -50,6 +50,8 @@ def corrigir_texto_ocr(texto):
                  .replace("0CT","OCT")
                  .replace("DE2","DEZ")
                  .replace("FEVEREIR0","FEVEREIRO")
+                 .replace("FEU","FEV")
+                 .replace("NOU","NOV")
                  .replace("UAL","VAL"))
 
 def converter_validade(mes_ano_str):
