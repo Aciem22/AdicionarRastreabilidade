@@ -109,7 +109,7 @@ for idx, item in enumerate(itens):
 
                 # extrai lote e validade
                 lm = re.search(r"(?:[Ll1]ote|[Ll1])[.:\s]*([A-Za-z0-9\-\/]+)", txtc)
-                vm = re.search( r"(?:VAL(?:IDADE)?|V)[\s:]*"        # prefixo "VAL","VALIDADE" ou "V"
+                vm = re.search( r"(?:VAL(?:IDADE)?|V)[.:\s]*"        # prefixo "VAL","VALIDADE" ou "V"
                                 r"([A-Z]{2,3}|0[1-9]|1[0-2])"               # grupo 1: "JAN" ou "04"
                                 r"[\/\-]?"                          # opcional "/" ou "-"
                                 r"(\d{2,4})", txtc, flags=re.IGNORECASE)
