@@ -9,8 +9,8 @@ import calendar
 import numpy as np
 
 # ─── Configurações da API ─────────────────────────────────────────────────────
-APP_KEY = "1724630275368"
-APP_SECRET = "549a26b527f429912abf81f18570030e"
+APP_KEY = st.secrets["APP_KEY"]
+APP_SECRET = st.secrets["APP_SECRET"]
 
 def consultar_pedido(numero_pedido):
     url = "https://app.omie.com.br/api/v1/produtos/pedido/"
