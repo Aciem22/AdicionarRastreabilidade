@@ -24,7 +24,7 @@ def consultar_pedido(numero_pedido):
     return dados, codigo_pedido
 
 # Função para alterar o pedido na API da Omie
-def alterar_pedido(codigo_pedido, novos_produtos):
+def alterar_pedido(codigo_pedido, novos_produtos, quantidade_caixas):
     url = "https://app.omie.com.br/api/v1/produtos/pedido/"
     payload = {
         "call": "AlterarPedidoVenda",
@@ -33,6 +33,10 @@ def alterar_pedido(codigo_pedido, novos_produtos):
           "param": {
             "cabecalho": {
                 "codigo_pedido": codigo_pedido,  # Agora o codigo_pedido está dentro de cabecalho
+            },
+            "frete":{
+                "quantidade_volumes":quantidade_caixas,
+                "especie_volumes":"CAIXAS"
             },
             "det": novos_produtos
         }
@@ -72,7 +76,8 @@ if numero_pedido:
     
             with st.form("form_lotes"):
                 valores_digitados = {}
-    
+                excluir_itens = []
+
                 for idx, item in enumerate(itens):
                     produto = item.get("produto", {})
                     descricao = produto.get("descricao", "")
@@ -103,8 +108,10 @@ if numero_pedido:
                     else:
                         fab = datetime.strptime(fabricacao,"%d/%m/%Y").date() if isinstance(fabricacao,str) else fabricacao
     
-                    col1, col2, col3, col4, col5 = st.columns([4, 2, 2, 2, 2])
+                    col1, col2, col3, col4, col5, col6 = st.columns([4, 2, 2, 2, 2, 1])
                     with col1:
+                        st.text("")                        
+                        st.text("")
                         st.text(f"{descricao} ({codigo})")
                     with col2:
                         valores_digitados[f"lote_{idx}"] = st.text_input("Lote",value=lote, key=f"lote_{idx}")
@@ -114,31 +121,47 @@ if numero_pedido:
                         valores_digitados[f"validade_{idx}"] = st.date_input("Validade", value=val, key=f"validade_{idx}")
                     with col5:
                         valores_digitados[f"qtd_{idx}"] = st.number_input("Qtd", value=quantidade, key=f"qtd_{idx}")
+                    with col6:
+                        st.text("Excluir")
+                        excluir_itens.append(
+                            st.checkbox("❌", key=f"excluir_{idx}")
+                        )
+
+                    st.markdown("<hr style='border: none; height: 1px; background-color: #5e5e5e;'>", unsafe_allow_html=True)
+                
+                frete = pedido.get("frete",{})
+                qtt_caixas = frete.get("quantidade_volumes")
+                quantidade_caixas = st.number_input("Quantidade de caixas", value=qtt_caixas, step=1)
     
                 if st.form_submit_button("💾 Salvar Dados"):
                     novos_produtos = []
                     for idx, item in enumerate(itens):
-                        produto = item.get("produto", {})
-                        ide = item.get("ide", {})
-    
-                        fabricacao_str = valores_digitados[f"fabricacao_{idx}"].strftime("%d/%m/%Y")
-                        validade_str = valores_digitados[f"validade_{idx}"].strftime("%d/%m/%Y")
+                            produto = item.get("produto", {})
+                            ide = item.get("ide", {})
+        
+                            fabricacao_str = valores_digitados[f"fabricacao_{idx}"].strftime("%d/%m/%Y")
+                            validade_str = valores_digitados[f"validade_{idx}"].strftime("%d/%m/%Y")
 
-                        novos_produtos.append({
-                            "ide": {
+                            ide_final = {
                                 "codigo_item": ide.get("codigo_item"),
-                                "simples_nacional": ide.get("simples_nacional")
-                            },
-                            "produto": produto,
-                            "rastreabilidade": {
-                                "numeroLote": valores_digitados[f"lote_{idx}"],
-                                "qtdeProdutoLote": valores_digitados[f"qtd_{idx}"],
-                                "dataFabricacaoLote": fabricacao_str,
-                                "dataValidadeLote": validade_str
+                                "simples_nacional": ide.get("simples_nacional"),
                             }
-                        })
+
+                            if excluir_itens[idx]:
+                                ide_final["acao_item"] = "E"
+
+                            novos_produtos.append({
+                                "ide": ide_final,
+                                "produto": produto,
+                                "rastreabilidade": {
+                                    "numeroLote": valores_digitados[f"lote_{idx}"],
+                                    "qtdeProdutoLote": valores_digitados[f"qtd_{idx}"],
+                                    "dataFabricacaoLote": fabricacao_str,
+                                    "dataValidadeLote": validade_str
+                                }
+                            })
     
-                    resultado = alterar_pedido(codigo_pedido, novos_produtos)
+                    resultado = alterar_pedido(codigo_pedido, novos_produtos, quantidade_caixas)
                     if resultado.get("faultstring"):
                         st.error(f"Erro ao alterar pedido: {resultado['faultstring']}")
                     else:
