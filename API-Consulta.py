@@ -3,8 +3,11 @@ import streamlit as st
 from datetime import date, datetime
 
 # Configurações da API
-APP_KEY = st.secrets["APP_KEY"]
-APP_SECRET = st.secrets["APP_SECRET"]
+#APP_KEY = st.secrets["APP_KEY"]
+#APP_SECRET = st.secrets["APP_SECRET"]
+
+APP_KEY = "1724630275368"
+APP_SECRET = "549a26b527f429912abf81f18570030e"
 
 # Função para consultar o pedido na API da Omie
 def consultar_pedido(numero_pedido):
@@ -100,15 +103,9 @@ if numero_pedido:
                             # se der erro, tenta yyyy-mm-dd
                             val = datetime.strptime(validade, "%Y-%m-%d").date()
                     else:
-                        val = validade      
-                    
-                    if (fabricacao == ""):
-                        fab = date(2022,1,1)
-
-                    else:
-                        fab = datetime.strptime(fabricacao,"%d/%m/%Y").date() if isinstance(fabricacao,str) else fabricacao
+                        val = validade
     
-                    col1, col2, col3, col4, col5, col6 = st.columns([4, 2, 2, 2, 2, 1])
+                    col1, col2, col3, col4, col5, = st.columns([4, 2, 2, 2, 1])
                     with col1:
                         st.text("")                        
                         st.text("")
@@ -116,12 +113,10 @@ if numero_pedido:
                     with col2:
                         valores_digitados[f"lote_{idx}"] = st.text_input("Lote",value=lote, key=f"lote_{idx}")
                     with col3:
-                        valores_digitados[f"fabricacao_{idx}"] = st.date_input("Fabricação", value=fab, key=f"fabricacao_{idx}")
-                    with col4:
                         valores_digitados[f"validade_{idx}"] = st.date_input("Validade", value=val, key=f"validade_{idx}")
-                    with col5:
+                    with col4:
                         valores_digitados[f"qtd_{idx}"] = st.number_input("Qtd", value=quantidade, key=f"qtd_{idx}")
-                    with col6:
+                    with col5:
                         st.text("Excluir")
                         excluir_itens.append(
                             st.checkbox("❌", key=f"excluir_{idx}")
@@ -139,8 +134,10 @@ if numero_pedido:
                             produto = item.get("produto", {})
                             ide = item.get("ide", {})
         
-                            fabricacao_str = valores_digitados[f"fabricacao_{idx}"].strftime("%d/%m/%Y")
-                            validade_str = valores_digitados[f"validade_{idx}"].strftime("%d/%m/%Y")
+                            validade = valores_digitados[f"validade_{idx}"]
+                            validade_str = validade.strftime("%d/%m/%Y")
+                            fabricacao_str = date(validade.year - 3, validade.month,1).strftime("%d/%m/%Y")
+
 
                             ide_final = {
                                 "codigo_item": ide.get("codigo_item"),
