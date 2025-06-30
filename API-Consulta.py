@@ -75,7 +75,7 @@ if numero_pedido:
     
             st.markdown(f"### Pedido Nº {numero_pedido} — {len(itens)} item(ns)")
             st.markdown("""<div style="background-color: rgb(23 45 67); color: rgb(176 235 255);padding: 12px;border-radius: 6px;border-left: 5px solid #0288d1;font-size: 16px;">
-                   🚨 Os campos <b>Validade</b> e <b>Fabricação</b> estão no padrão ISO - Ano/Mês/Dia.</div> <br>""",unsafe_allow_html=True)
+                   🚨 O campo de <b>Validade</b> está no padrão ISO - Ano/Mês/Dia.</div> <br>""",unsafe_allow_html=True)
     
             with st.form("form_lotes"):
                 valores_digitados = {}
