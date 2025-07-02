@@ -73,7 +73,10 @@ if numero_pedido:
             st.markdown(f"### Pedido Nº {numero_pedido} — {len(itens)} item(ns)")
             st.markdown("""<div style="background-color: rgb(23 45 67); color: rgb(176 235 255);padding: 12px;border-radius: 6px;border-left: 5px solid #0288d1;font-size: 16px;">
                    🚨 O campo de <b>Validade</b> está no padrão ISO - Ano/Mês/Dia.</div> <br>""",unsafe_allow_html=True)
-    
+
+            # Ordena os itens pela descrição do produto (A → Z)
+            itens = sorted(itens, key=lambda x: x.get("produto", {}).get("descricao", "").lower())
+            
             with st.form("form_lotes"):
                 valores_digitados = {}
                 excluir_itens = []
@@ -101,23 +104,27 @@ if numero_pedido:
                             val = datetime.strptime(validade, "%Y-%m-%d").date()
                     else:
                         val = validade
-    
-                    col1, col2, col3, col4, col5, = st.columns([4, 2, 2, 2, 1])
-                    with col1:
-                        st.text("")                        
-                        st.text("")
-                        st.text(f"{descricao} ({codigo})")
-                    with col2:
-                        valores_digitados[f"lote_{idx}"] = st.text_input("Lote",value=lote, key=f"lote_{idx}")
-                    with col3:
-                        valores_digitados[f"validade_{idx}"] = st.date_input("Validade", value=val, key=f"validade_{idx}")
-                    with col4:
-                        valores_digitados[f"qtd_{idx}"] = st.number_input("Qtd", value=quantidade, key=f"qtd_{idx}")
-                    with col5:
-                        st.text("Excluir")
-                        excluir_itens.append(
-                            st.checkbox("❌", key=f"excluir_{idx}")
-                        )
+
+                    # Abre automaticamente se lote ou validade estiverem vazios
+                    expandir = (lote == "" or validade == "")
+                    
+                    with st.expander(f"{descricao} ({codigo})", expanded=expandir):
+                        col1, col2, col3, col4, col5, = st.columns([4, 2, 2, 2, 1])
+                        with col1:
+                            st.text("")                        
+                            st.text("")
+                            st.text(f"{descricao} ({codigo})")
+                        with col2:
+                            valores_digitados[f"lote_{idx}"] = st.text_input("Lote",value=lote, key=f"lote_{idx}")
+                        with col3:
+                            valores_digitados[f"validade_{idx}"] = st.date_input("Validade", value=val, key=f"validade_{idx}")
+                        with col4:
+                            valores_digitados[f"qtd_{idx}"] = st.number_input("Qtd", value=quantidade, key=f"qtd_{idx}")
+                        with col5:
+                            st.text("Excluir")
+                            excluir_itens.append(
+                                st.checkbox("❌", key=f"excluir_{idx}")
+                            )
 
                     st.markdown("<hr style='border: none; height: 1px; background-color: #5e5e5e;'>", unsafe_allow_html=True)
                 
