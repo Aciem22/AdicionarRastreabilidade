@@ -12,10 +12,9 @@ import json
 import tempfile
 import pandas as pd
 
-# Função para carregar a planilha com cache
-@st.cache_data(show_spinner=False)
-def carregar_lotes_validade():
+st.set_page_config(page_title="Cadastro de Lotes", layout="wide")
 
+def carregar_lotes_validade():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["gcp_service_account"], scope)
     client = gspread.authorize(creds)
@@ -30,6 +29,18 @@ def carregar_lotes_validade():
     df["VALIDADE"] = df["VALIDADE"].astype(str)
 
     return df
+
+# Se ainda não carregou a planilha, carrega uma vez
+if "df_lotes" not in st.session_state:
+    st.session_state.df_lotes = carregar_lotes_validade()
+
+# Botão manual para recarregar a planilha
+if st.button("🔄 Recarregar Planilha"):
+    st.session_state.df_lotes = carregar_lotes_validade()
+    st.success("Planilha recarregada com sucesso!")
+
+# Usa os dados sempre do session_state
+df_lotes = st.session_state.df_lotes
 
 # Carrega os dados da planilha uma vez só
 df_lotes = carregar_lotes_validade()
