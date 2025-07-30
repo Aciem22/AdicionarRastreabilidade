@@ -128,7 +128,7 @@ if numero_pedido:
                    🚨 O campo de <b>Validade</b> está no padrão ISO - Ano/Mês/Dia.</div> <br>""",unsafe_allow_html=True)
 
             # Ordena os itens pela descrição do produto (A → Z)
-            itens = sorted(itens, key=lambda x: x.get("produto", {}).get("descricao", "").lower())
+            #itens = sorted(itens, key=lambda x: x.get("produto", {}).get("descricao", "").lower())
             
             with st.form("form_lotes"):
                 valores_digitados = {}
