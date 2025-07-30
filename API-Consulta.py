@@ -101,7 +101,6 @@ def alterar_pedido(codigo_pedido, novos_produtos, quantidade_caixas):
     #st.write("🔍 Resposta da API Omie:", resultado)
     #return resultado
 
-st.set_page_config(page_title="Cadastro de Lotes", layout="wide")
 st.title("🔍 Cadastro de Rastreabilidade")
 
 numero_pedido = st.text_input("Digite o número do pedido:")
