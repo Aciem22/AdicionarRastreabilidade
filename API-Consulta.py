@@ -161,7 +161,7 @@ if numero_pedido:
 
                         if validade == "INDEFINIDO" or validade is None or validade == "":
                             rastreabilidade = {
-                                "numeroLote": valores_digitados.get(f"lote_{idx}", ""),
+                                #"numeroLote": valores_digitados.get(f"lote_{idx}", ""),
                                 "qtdeProdutoLote": valores_digitados.get(f"qtd_{idx}", 0)
                             }
                         else:
@@ -188,3 +188,4 @@ if numero_pedido:
                         st.success("Pedido alterado com sucesso!")
         else:
             st.error("Pedido não encontrado ou resposta inválida da API.")
+
