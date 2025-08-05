@@ -14,7 +14,15 @@ import pandas as pd
 from utils.api_omie import consultar_pedido, alterar_pedido
 from utils.sheets import carregar_lotes_validade
 
+def ping_servidor():
+    while True:
+        print(f"🔄 Ping enviado às {time.strftime('%H:%M:%S')}")
+        time.sleep(60)  # ping a cada 60 segundos
 
+# Garante que só uma thread seja iniciada
+if "ping_thread" not in globals():
+    ping_thread = threading.Thread(target=ping_servidor, daemon=True)
+    ping_thread.start()
 
 st.set_page_config(page_title="Cadastro de Lotes", layout="wide")
 
@@ -188,4 +196,5 @@ if numero_pedido:
                         st.success("Pedido alterado com sucesso!")
         else:
             st.error("Pedido não encontrado ou resposta inválida da API.")
+
 
