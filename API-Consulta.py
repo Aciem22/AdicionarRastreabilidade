@@ -189,15 +189,6 @@ if numero_pedido:
                             "rastreabilidade": rastreabilidade
                         })
 
-                    # 🔹 Mostrar o JSON que vai ser enviado antes da chamada
-                    st.write("===== JSON QUE SERÁ ENVIADO =====")
-                    st.json({
-                        "cabecalho": {"codigo_pedido": codigo_pedido},
-                        "frete": {"quantidade_volumes": quantidade_caixas, "especie_volumes": "CAIXAS"},
-                        "det": novos_produtos
-                    })
-                    st.write("===============================")
-
                     resultado = alterar_pedido(codigo_pedido, novos_produtos, quantidade_caixas)
                     if resultado.get("faultstring"):
                         st.error(f"Erro ao alterar pedido: {resultado['faultstring']}")
@@ -205,6 +196,7 @@ if numero_pedido:
                         st.success("Pedido alterado com sucesso!")
         else:
             st.error("Pedido não encontrado ou resposta inválida da API.")
+
 
 
 
