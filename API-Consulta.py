@@ -65,7 +65,7 @@ if numero_pedido:
 
     # Ordena apenas para exibição
     itens_com_indices = list(enumerate(itens))
-    itens_exibir = sorted(itens_com_indices, key=lambda x: x[1].get("produto", {}).get("descricao", "").lower())
+    itens_exibir = itens_com_indices
 
     with st.form("form_lotes"):
         valores_digitados = {}
@@ -186,3 +186,4 @@ else:
     st.error("Pedido não encontrado ou resposta inválida da API.")
 
                     
+
