@@ -92,10 +92,10 @@ if numero_pedido:
                         filtro_lote = df_lotes.loc[df_lotes["Código do Produto"] == codigo, "LOTE"]
                         lote_apostrofo = filtro_lote.values[0] if not filtro_lote.empty else ""
                         lote_sel = lote_apostrofo[1:] if lote_apostrofo else ""
-                        lote_input = st.text_input("Lote", value=lote_sel, key=f"lote_sel_{idx_real}")
+                        lote_input = st.text_input("Lote", value=lote_sel, key=f"lote_sel_{numero_pedido}_{idx_real}")
                         valores_digitados[f"lote_{idx_real}"] = lote_input
                     except (ValueError, AttributeError):
-                        lote_input = st.text_input("Lote", key=f"lote_sel_{idx_real}")
+                        lote_input = st.text_input("Lote", key=f"lote_sel_{numero_pedido}_{idx_real}")
                         valores_digitados[f"lote_{idx_real}"] = ""
 
                 with col3:
@@ -103,12 +103,12 @@ if numero_pedido:
                         filtro_validade = df_lotes.loc[df_lotes["Código do Produto"] == codigo, "VALIDADE"]
                         if not filtro_validade.empty:
                             opcoes_validade = [filtro_validade.values[0], "INDEFINIDO", "NOVA DATA"]
-                            escolha = st.selectbox("Validade", opcoes_validade, key=f"validade_opcao_{idx_real}")
+                            escolha = st.selectbox("Validade", opcoes_validade, key=f"validade_opcao_{numero_pedido}_{idx_real}")
 
                             if escolha in ["INDEFINIDO", "S/V", ""]:
                                 valores_digitados[f"validade_{idx_real}"] = "INDEFINIDO"
                             elif escolha == "NOVA DATA":
-                                nova = st.date_input("Digite nova data", key=f"validade_input_{idx_real}")
+                                nova = st.date_input("Digite nova data", key=f"validade_input_{numero_pedido}_{idx_real}")
                                 valores_digitados[f"validade_{idx_real}"] = nova if nova else None
                             else:
                                 mes, ano = escolha.split("/")
@@ -123,9 +123,9 @@ if numero_pedido:
                         st.warning(f"Erro ao tratar validade do produto {codigo}: {e}")
 
                 with col4:
-                    valores_digitados[f"qtd_{idx_real}"] = st.number_input("Qtd", value=quantidade, key=f"qtd_{idx_real}")
+                    valores_digitados[f"qtd_{idx_real}"] = st.number_input("Qtd", value=quantidade, key=f"qtd_{numero_pedido}_{idx_real}", disabled = True)
                 with col5:
-                    excluir = st.checkbox("❌", key=f"excluir_{idx_real}")
+                    excluir = st.checkbox("❌", key=f"excluir{numero_pedido}_{idx_real}")
                     excluir_itens.append(excluir)
 
         st.markdown("<hr style='border: none; height: 1px; background-color: #5e5e5e;'>", unsafe_allow_html=True)
@@ -186,4 +186,5 @@ else:
     st.error("Pedido não encontrado ou resposta inválida da API.")
 
                     
+
 
