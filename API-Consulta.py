@@ -63,8 +63,6 @@ if numero_pedido:
     qtd_itens = sum(item.get("produto",{}).get("quantidade",0) for item in itens)
 
     st.markdown(f"### Pedido Nº {numero_pedido} — {qtd_skus} SKU(s) | {qtd_itens} item(ns)")
-    
-    st.markdown(f"### Pedido Nº {numero_pedido} — {len(itens)} item(ns)")
     st.markdown("""<div style="background-color: rgb(23 45 67); color: rgb(176 235 255);padding: 12px;border-radius: 6px;border-left: 5px solid #0288d1;font-size: 16px;">
         🚨 O campo de <b>Validade</b> está no padrão ISO - Ano/Mês/Dia.</div> <br>""", unsafe_allow_html=True)
 
@@ -189,6 +187,7 @@ if numero_pedido:
                 st.success("Pedido alterado com sucesso!")
 
                     
+
 
 
 
