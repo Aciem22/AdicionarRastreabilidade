@@ -29,7 +29,7 @@ def get_creds():
                 "client_secret": client_config["client_secret"],
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [f"https://rastreabilidadelenvie.streamlitapp.io/"]
+                "redirect_uris": ["https://rastreabilidadelenvie.streamlitapp.io/"]
             }
         },
         scopes=[
