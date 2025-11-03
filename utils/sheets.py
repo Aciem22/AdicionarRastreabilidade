@@ -1,15 +1,25 @@
+import streamlit as st
 import gspread
 from google_auth_oauthlib.flow import Flow
+from google.auth.transport.requests import Request
 import pandas as pd
-import streamlit as st
+import pickle
+import os
 
-@st.cache_data
-def carregar_lotes_validade():
-    scope = [
-        "https://www.googleapis.com/auth/spreadsheets.readonly",
-        "https://www.googleapis.com/auth/drive.readonly"
-    ]
+# === Função para autenticação OAuth Web ===
+def get_creds():
+    if "oauth_creds" in st.session_state:
+        return st.session_state["oauth_creds"]
 
+    # Cache do token no arquivo interno
+    token_path = "token.pkl"
+    if os.path.exists(token_path):
+        with open(token_path, "rb") as f:
+            creds = pickle.load(f)
+            st.session_state["oauth_creds"] = creds
+            return creds
+
+    # Configura OAuth flow
     client_config = st.secrets["gcp_oauth"]
     flow = Flow.from_client_config(
         {
@@ -18,39 +28,49 @@ def carregar_lotes_validade():
                 "client_secret": client_config["client_secret"],
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
+                "redirect_uris": ["https://<seu-usuario>.streamlitapp.io/"]
             }
         },
-        scopes=scope
+        scopes=[
+            "https://www.googleapis.com/auth/spreadsheets.readonly",
+            "https://www.googleapis.com/auth/drive.readonly"
+        ]
     )
 
-    if "oauth_creds" in st.session_state:
-        creds = st.session_state["oauth_creds"]
-    else:
-        auth_url, _ = flow.authorization_url(prompt='consent')
-        st.write("🚀 Abra este link em outro navegador e copie o código de autorização:")
-        st.write(auth_url)
-        
-        code = st.text_input("Cole aqui o código de autorização", key="oauth_code")
-        if not code:
-            st.stop()
-        
-        flow.fetch_token(code=code)
-        creds = flow.credentials
-        st.session_state["oauth_creds"] = creds
+    auth_url, _ = flow.authorization_url(prompt='consent')
+    st.write("🚀 Clique no link abaixo, autorize o acesso e cole a URL final:")
+    st.write(auth_url)
 
+    url_response = st.text_input("Cole aqui a URL após autorização", key="url_input")
+    if not url_response:
+        st.stop()
+
+    flow.fetch_token(authorization_response=url_response)
+    creds = flow.credentials
+    st.session_state["oauth_creds"] = creds
+
+    # Salva token no cache
+    with open(token_path, "wb") as f:
+        pickle.dump(creds, f)
+
+    return creds
+
+# === Função para carregar planilha ===
+@st.cache_data
+def carregar_lotes_validade():
+    creds = get_creds()
     client = gspread.authorize(creds)
-    planilha = client.open("Controle Lote e Val Rastreabilidade")
-    aba = planilha.worksheet("Lotes")
+    planilha = client.open(st.secrets["gcp_oauth"]["spreadsheet_name"])
+    aba = planilha.worksheet(st.secrets["gcp_oauth"]["worksheet_name"])
     dados = aba.get_all_records()
     df = pd.DataFrame(dados)
 
     df["Código do Produto"] = df["Código do Produto"].astype(str)
     df["LOTE"] = df["LOTE"].astype(str).apply(lambda x: f"'{x}")
     df["VALIDADE"] = df["VALIDADE"].astype(str)
-
     return df
 
+# === Streamlit UI ===
 st.title("Lotes e Validades")
 df_lotes = carregar_lotes_validade()
 st.dataframe(df_lotes)
